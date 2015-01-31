@@ -25,12 +25,14 @@ class PolicyAccounting(object):
         if not self.policy.invoices:
             self.make_invoices()
 
+    #Problem 3
+    #includes date_cursor in the query
     def return_account_balance(self, date_cursor=None):
         if not date_cursor:
             date_cursor = datetime.now().date()
 
         invoices = Invoice.query.filter_by(policy_id=self.policy.id)\
-                                .filter(Invoice.bill_date < date_cursor)\
+                                .filter(Invoice.bill_date <= date_cursor)\
                                 .order_by(Invoice.bill_date)\
                                 .all()
         due_now = 0
@@ -38,7 +40,7 @@ class PolicyAccounting(object):
             due_now += invoice.amount_due
 
         payments = Payment.query.filter_by(policy_id=self.policy.id)\
-                                .filter(Payment.transaction_date < date_cursor)\
+                                .filter(Payment.transaction_date <= date_cursor)\
                                 .all()
         for payment in payments:
             due_now -= payment.amount_paid
