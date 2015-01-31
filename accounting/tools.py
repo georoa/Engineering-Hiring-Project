@@ -130,8 +130,17 @@ class PolicyAccounting(object):
                                   bill_date + relativedelta(months=1, days=14),
                                   self.policy.annual_premium / billing_schedules.get(self.policy.billing_schedule))
                 invoices.append(invoice)
-        elif self.policy.billing_schedule == "Monthly":
-            pass
+        elif self.policy.billing_schedule == "Monthly":  #problem 1.
+            first_invoice.amount_due = first_invoice.amount_due / billing_schedules.get(self.policy.billing_schedule)  #set invoices amount_due = amount_due/billing_schedule
+            for i in range(1, billing_schedules.get(self.policy.billing_schedule)):
+                months_after_eff_date = i
+                bill_date = self.policy.effective_date + relativedelta(months=months_after_eff_date)
+                invoice = Invoice(self.policy.id,  #create new invoice object with new info.
+                                  bill_date,  #bill date
+                                  bill_date + relativedelta(months=1),  #due date
+                                  bill_date + relativedelta(months=1, days=14),  #cancel date
+                                  self.policy.annual_premium / billing_schedules.get(self.policy.billing_schedule))  #amount left/due
+                invoices.append(invoice)
         else:
             print "You have chosen a bad billing schedule."
 
