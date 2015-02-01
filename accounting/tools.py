@@ -28,9 +28,9 @@ class PolicyAccounting(object):
     #Problem 3
     #includes date_cursor in the query
     def return_account_balance(self, date_cursor=None):
-    """
-        Shows the up-to-date remaining account balance to be payed.
-    """
+        """
+            Shows the up-to-date remaining account balance to be payed.
+        """
         if not date_cursor:
             date_cursor = datetime.now().date()
 
@@ -104,9 +104,9 @@ class PolicyAccounting(object):
 
 
     def make_invoices(self):
-         """
+        """
             Creates first invoice and every invoice aferwards; Dependent on which billing schedule is selected.
-         """
+        """
         for invoice in self.policy.invoices:
             invoice.delete()
 
