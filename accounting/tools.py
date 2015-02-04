@@ -127,7 +127,7 @@ class PolicyAccounting(object):
         for invoice in self.policy.invoices:
             invoice.delete()
 
-        billing_schedules = {'Annual': None, 'Semi-Annual': 3, 'Quarterly': 4, 'Monthly': 12}
+        billing_schedules = {'Annual': None, 'Two-Pay': 2, 'Quarterly': 4, 'Monthly': 12}
 
         invoices = []
         first_invoice = Invoice(self.policy.id,
@@ -177,6 +177,76 @@ class PolicyAccounting(object):
 
         for invoice in invoices:
             db.session.add(invoice)
+        db.session.commit()
+
+    def change_billing_schedule(self, new_billing_schedule, date_cursor = None):
+        """
+        Changes existing billing schedule, marks old invoices as deleted, and creates invoices for new billing schedule.
+        """
+        billing_schedules = {'Annual': None, 'Two-Pay': 2, 'Quarterly': 4, 'Monthly': 12}
+
+        if not date_cursor:
+            date_cursor = datetime.now().date()
+
+        list_of_new_invoices = []
+        #redefine billing schedule
+        self.policy.billing_schedule = new_billing_schedule
+
+        #self.make_invoices()
+        if self.policy.billing_schedule == 'Annual':
+            invoice = Invoice(self.policy.id,
+                self.policy.effective_date, #bill_date
+                self.policy.effective_date + relativedelta(months=1), #due
+                self.policy.effective_date + relativedelta(months=1, days=14), #cancel
+                self.policy.annual_premium) #amount owed
+            list_of_new_invoices.append(invoice)
+
+        elif self.policy.billing_schedule == 'Two-Pay':
+            for i in range(1, billing_schedules.get('Two-Pay') + 1):
+                months_after_eff_date = i*6
+                bill_date = self.policy.effective_date + relativedelta(months=months_after_eff_date)
+                invoice = Invoice(self.policy.id,
+                    bill_date, #bill_date
+                    bill_date + relativedelta(months=1), #due
+                    bill_date + relativedelta(months=1, days=14), #cancel
+                    self.policy.annual_premium / billing_schedules.get('Two-Pay')) #amount owed
+                list_of_new_invoices.append(invoice)
+
+        elif self.policy.billing_schedule == 'Quarterly':
+            for i in range(1, billing_schedules.get('Quarterly') + 1):
+                months_after_eff_date = i*3
+                bill_date = self.policy.effective_date + relativedelta(months=months_after_eff_date)
+                invoice = Invoice(self.policy.id,
+                    bill_date, #bill_date
+                    bill_date + relativedelta(months=1), #due
+                    bill_date + relativedelta(months=1, days=14), #cancel
+                    self.policy.annual_premium / billing_schedules.get('Quarterly')) #amount owed
+                list_of_new_invoices.append(invoice)
+
+        elif self.policy.billing_schedule == 'Monthly':
+            for i in range(1, billing_schedules.get('Monthly') + 1):
+                months_after_eff_date = i
+                bill_date = self.policy.effective_date + relativedelta(months=months_after_eff_date)
+                invoice = Invoice(self.policy.id,
+                    bill_date, #bill_date
+                    bill_date + relativedelta(months=1), #due
+                    bill_date + relativedelta(months=1, days=14), #cancel
+                    self.policy.annual_premium / billing_schedules.get('Monthly')) #amount owed
+                list_of_new_invoices.append(invoice)
+
+        #marks old policies as deleted
+        for invoice in self.policy.invoices:
+            invoice.deleted = True
+
+        #adds new policies to the db
+        for invoice in list_of_new_invoices:
+            db.session.add(invoice)
+
+        #update the policies billing_schedule
+        db.session.query(Policy).filter_by(policy_number =self.policy.policy_number).update({"billing_schedule": new_billing_schedule})
+
+        #update payment?
+
         db.session.commit()
 
 ################################
