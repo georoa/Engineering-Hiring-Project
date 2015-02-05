@@ -1,15 +1,30 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
   <meta charset="utf-8">
-  <title>Some sort of title?</title>
-  <meta name="description" content="What is this?">
-  <meta name="author" content="Who?">
+  <title>Policy View</title>
+  <meta name="description" content="View policy information.">
+  <meta name="author" content="Geo Roa">
   <!--[if lt IE 9]>
 <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 </head>
 <body>
-    <p>Your server is working.</p>
+    <h1>Welcome!</h1>
+
+    <!--action = route to function -->
+    <form action = "/get_invoices" method = "POST">
+    Policy Number:<br>
+    <input type="text" name="policy_number">
+    <br>
+    Date:<br>
+    <input type="date" name="date">
+    <br>
+    <input type="submit" value="Submit">
+    </form>
+
+
+
 </body>
 </html>
