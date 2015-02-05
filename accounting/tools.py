@@ -50,6 +50,30 @@ class PolicyAccounting(object):
 
         return due_now
 
+    def total_remaining_premium(self, date_cursor=None):
+        """
+            Finds total premium including future invoices.
+        """
+        if not date_cursor:
+            date_cursor = datetime.now().date()
+
+        invoices = Invoice.query.filter_by(policy_id=self.policy.id)\
+                                .filter(Invoice.deleted != 1)\
+                                .order_by(Invoice.bill_date)\
+                                .all()
+
+        total_premium = 0
+        for invoice in invoices:
+            total_premium += invoice.amount_due
+
+        payments = Payment.query.filter_by(policy_id=self.policy.id)\
+                                .filter(Payment.transaction_date <= date_cursor)\
+                                .all()
+        for payment in payments:
+            total_premium -= payment.amount_paid
+
+        return total_premium
+
     def make_payment(self, contact_id=None, date_cursor=None, amount=0):
         """
             Adds payment information to the db.
@@ -118,6 +142,20 @@ class PolicyAccounting(object):
                 break
         else:
             print "THIS POLICY SHOULD NOT CANCEL"
+
+    def descriptive_cancel_policy(self, description=None, date_cursor=None):
+        """
+            Cancels a policy by changing its status to Canceled, stores date it got canceled, and stores descriptive info why the policy was canceled. 
+        """
+        if not date_cursor:
+            date_cursor = datetime.now().date()
+
+        self.policy.description = description
+        self.policy.cancel_date = date_cursor
+        self.policy.status = 'Canceled'
+
+        db.session.commit()
+
 
 
     def make_invoices(self):
@@ -188,17 +226,18 @@ class PolicyAccounting(object):
         if not date_cursor:
             date_cursor = datetime.now().date()
 
+        new_premium = self.total_remaining_premium(date_cursor)
+
         list_of_new_invoices = []
         #redefine billing schedule
         self.policy.billing_schedule = new_billing_schedule
 
-        #self.make_invoices()
         if self.policy.billing_schedule == 'Annual':
             invoice = Invoice(self.policy.id,
                 self.policy.effective_date, #bill_date
                 self.policy.effective_date + relativedelta(months=1), #due
                 self.policy.effective_date + relativedelta(months=1, days=14), #cancel
-                self.policy.annual_premium) #amount owed
+                new_premium) #amount owed
             list_of_new_invoices.append(invoice)
 
         elif self.policy.billing_schedule == 'Two-Pay':
@@ -209,7 +248,7 @@ class PolicyAccounting(object):
                     bill_date, #bill_date
                     bill_date + relativedelta(months=1), #due
                     bill_date + relativedelta(months=1, days=14), #cancel
-                    self.policy.annual_premium / billing_schedules.get('Two-Pay')) #amount owed
+                    new_premium/ billing_schedules.get('Two-Pay')) #amount owed
                 list_of_new_invoices.append(invoice)
 
         elif self.policy.billing_schedule == 'Quarterly':
@@ -220,7 +259,7 @@ class PolicyAccounting(object):
                     bill_date, #bill_date
                     bill_date + relativedelta(months=1), #due
                     bill_date + relativedelta(months=1, days=14), #cancel
-                    self.policy.annual_premium / billing_schedules.get('Quarterly')) #amount owed
+                    new_premium / billing_schedules.get('Quarterly')) #amount owed
                 list_of_new_invoices.append(invoice)
 
         elif self.policy.billing_schedule == 'Monthly':
@@ -231,7 +270,7 @@ class PolicyAccounting(object):
                     bill_date, #bill_date
                     bill_date + relativedelta(months=1), #due
                     bill_date + relativedelta(months=1, days=14), #cancel
-                    self.policy.annual_premium / billing_schedules.get('Monthly')) #amount owed
+                    new_premium / billing_schedules.get('Monthly')) #amount owed
                 list_of_new_invoices.append(invoice)
 
         #marks old policies as deleted
