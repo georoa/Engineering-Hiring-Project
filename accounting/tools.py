@@ -226,6 +226,7 @@ class PolicyAccounting(object):
         if not date_cursor:
             date_cursor = datetime.now().date()
 
+        #updates new payment plan
         new_premium = self.total_remaining_premium(date_cursor)
 
         list_of_new_invoices = []
@@ -283,8 +284,6 @@ class PolicyAccounting(object):
 
         #update the policies billing_schedule
         db.session.query(Policy).filter_by(policy_number =self.policy.policy_number).update({"billing_schedule": new_billing_schedule})
-
-        #update payment?
 
         db.session.commit()
 

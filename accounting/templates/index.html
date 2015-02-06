@@ -12,19 +12,47 @@
 </head>
 <body>
     <h1>Welcome!</h1>
-
-    <!--action = route to function -->
-    <form action = "/get_invoices" method = "POST">
-    Policy Number:<br>
-    <input type="text" name="policy_number">
+    <p class="description">Fill out the form below to view a policies' Invoice(s) and Account Balance. </p>
+    <div>
+        <!--action = route to function -->
+        <form action = "/get_policy" method = 'POST'>
+            <label>Policy Number:</label>
+            <input type="text" placeholder="Test Policy" name="policy_number">
+            <br>
+            <label>Date:</label> <br>
+            <input type="date" placeholder="Year-Month-Day" name="date">
+            <br>
+            <input class = "submit" type="submit" value="Submit">
+        </form>
+    </div>
     <br>
-    Date:<br>
-    <input type="date" name="date">
-    <br>
-    <input type="submit" value="Submit">
-    </form>
 
+    {% if display %}
+        <div class="balance">
+            <h3>Account Balance As Of {{ date }} </h3>
+            <p class="money">$ {{ balance }}</p>
+        </div>
+        <br>
+        <div class = "invoices"">
+            <h3>All Active Invoices For {{ policy }}</h3>
 
-
+                <table>
+                    <tr>
+                        <th>Bill Date</th>
+                        <th>Due Date</th>
+                        <th>Cancel Date</th>
+                        <th>Amount Due</th>
+                    </tr>
+                    {% for invoice in invoices %}
+                        <tr>
+                            <td>{{ invoice.bill_date }}</td>
+                            <td>{{ invoice.due_date }}</td>
+                            <td>{{ invoice.cancel_date }}</td>
+                            <td>{{ invoice.amount_due }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+        </div>
+    {% endif %}
 </body>
 </html>
