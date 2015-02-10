@@ -32,6 +32,12 @@ p.money
     padding: 0;
 }
 
+p.error
+{
+    text-align: center;
+    font-size: 25pt;
+}
+
 form
 {
     width: 300px ;
@@ -51,16 +57,26 @@ input
     margin-left: 10px;
 }
 
-table, th, td {
+table
+{
+    margin: auto;
+    border-collapse: collapse;
+}
+
+th, td{
     margin: auto;
     border: 1px solid black;
-    border-collapse: collapse;
     background: #eef;
 }
 
 th,td
 {
     padding: 15px;
+}
+
+td.paid
+{
+    color: green;
 }
 
 .balance

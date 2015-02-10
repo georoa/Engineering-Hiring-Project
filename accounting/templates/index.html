@@ -30,7 +30,7 @@
     {% if display %}
         <div class="balance">
             <h3>Account Balance As Of {{ date }} </h3>
-            <p class="money">$ {{ balance }}</p>
+            <p class="money">$ {{ balance }}.00</p>
         </div>
         <br>
         <div class = "invoices"">
@@ -49,10 +49,16 @@
                             <td>{{ invoice.due_date }}</td>
                             <td>{{ invoice.cancel_date }}</td>
                             <td>{{ invoice.amount_due }}</td>
+                            {% if paid != 0 %}
+                                <td class="paid">Paid</td>
+                                {% set paid = paid-1 %}
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </table>
         </div>
+    {% elif display == False %}
+        <p class="error"> {{ error }} </p>
     {% endif %}
 </body>
 </html>

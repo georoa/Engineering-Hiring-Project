@@ -10,9 +10,7 @@ from tools import PolicyAccounting
 from datetime import date, datetime
 
 # Routing for the server.
-@app.route("/policy")
-
-
+@app.route("/")
 @app.route("/get_policy", methods=["POST"])
 def get_invoices():
     if request.method == 'POST':
@@ -27,11 +25,16 @@ def get_invoices():
             #filter invoices to policy that was submitted
             invoices = Invoice.query.filter(Invoice.policy_id == policy.id)\
                                     .filter(Invoice.deleted != 1).all()
+            #filter paid invoices
+            payments = Payment.query.filter(Payment.policy_id == policy.id).all()
+            paid = len(payments)
+
             account_balance = pa.return_account_balance(date_cursor)
 
-            return render_template('index.html', display=True, balance=account_balance, date=date_cursor, policy=policy_number,invoices=invoices)
+            return render_template('index.html', display=True, balance=account_balance, date=date_cursor, policy=policy_number,invoices=invoices, paid=paid)
         else:
-            return render_template('index.html', display=False)
+            error = "Sorry the policy you entered may not exist."
+            return render_template('index.html', display=False, error=error)
 
     else:
         error = "Error: Please try again!"
