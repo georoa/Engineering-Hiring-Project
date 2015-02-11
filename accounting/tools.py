@@ -219,6 +219,7 @@ class PolicyAccounting(object):
             db.session.add(invoice)
         db.session.commit()
 
+    #Problem 8
     def change_billing_schedule(self, new_billing_schedule, date_cursor = None):
         """
         Changes existing billing schedule, marks old invoices as deleted, and creates invoices for new billing schedule.
