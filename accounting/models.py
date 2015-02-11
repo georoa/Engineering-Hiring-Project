@@ -17,6 +17,7 @@ class Policy(db.Model):
     annual_premium = db.Column(u'annual_premium', db.INTEGER(), nullable=False)
     named_insured = db.Column(u'named_insured', db.INTEGER(), db.ForeignKey('contacts.id'))
     agent = db.Column(u'agent', db.INTEGER(), db.ForeignKey('contacts.id'))
+    #Problem 9. Add additional columns 
     description = db.Column(u'description', db.VARCHAR(length=500), nullable=True)
     cancel_date = db.Column(u'cancel_date', db.DATE(), nullable=True)
 

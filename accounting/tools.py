@@ -50,6 +50,7 @@ class PolicyAccounting(object):
 
         return due_now
 
+    #Problem 8. Helper function to find remaining premium from switching in the middle of a policy
     def total_remaining_premium(self, date_cursor=None):
         """
             Finds total premium including future invoices.
@@ -96,6 +97,7 @@ class PolicyAccounting(object):
 
         return payment
 
+    # Problem 7
     def evaluate_cancellation_pending_due_to_non_pay(self, date_cursor=None):
         """
          If this function returns true, an invoice
@@ -143,6 +145,7 @@ class PolicyAccounting(object):
         else:
             print "THIS POLICY SHOULD NOT CANCEL"
 
+    #Problem 9.
     def descriptive_cancel_policy(self, description=None, date_cursor=None):
         """
             Cancels a policy by changing its status to Canceled, stores date it got canceled, and stores descriptive info why the policy was canceled. 
@@ -155,8 +158,6 @@ class PolicyAccounting(object):
         self.policy.status = 'Canceled'
 
         db.session.commit()
-
-
 
     def make_invoices(self):
         """
@@ -200,7 +201,8 @@ class PolicyAccounting(object):
                                   self.policy.annual_premium / billing_schedules.get(self.policy.billing_schedule))
                 invoices.append(invoice)
         elif self.policy.billing_schedule == "Monthly":  #problem 1.
-            first_invoice.amount_due = first_invoice.amount_due / billing_schedules.get(self.policy.billing_schedule)  #set invoices amount_due = amount_due/billing_schedule
+            first_invoice.amount_due = first_invoice.amount_due / billing_schedules.get(self.policy.billing_schedule)  #sets first invoice amount_due = amount_due/billing_schedule
+            #loop thru each invoice - 1
             for i in range(1, billing_schedules.get(self.policy.billing_schedule)):
                 months_after_eff_date = i
                 bill_date = self.policy.effective_date + relativedelta(months=months_after_eff_date)

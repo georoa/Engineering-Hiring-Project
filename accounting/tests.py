@@ -16,7 +16,6 @@ Test Suite for PolicyAccounting
 
 #Test Problem 9.
 class TestCancelPolicy(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.policy = Policy('Test Policy', date(2015, 1, 1), 1200)
@@ -46,9 +45,7 @@ class TestCancelPolicy(unittest.TestCase):
         self.assertEquals(self.policy.cancel_date, datetime.now().date())
         self.assertEquals(self.policy.status, "Canceled")
 
-
 class TestBillingSchedules(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.test_agent = Contact('Test Agent', 'Agent')
@@ -113,7 +110,6 @@ class TestBillingSchedules(unittest.TestCase):
         self.assertEquals(active_invoices[0].amount_due, pa.policy.annual_premium/12)
 
 class TestReturnAccountBalance(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.test_agent = Contact('Test Agent', 'Agent')

@@ -1,4 +1,3 @@
-
 policy = raw_input('Enter the policy name you want to add: ')
 year = raw_input('Enter the effective date year: ')
 month  = raw_input('Enter the effective date month (Must include leading zeros if any!): ')
